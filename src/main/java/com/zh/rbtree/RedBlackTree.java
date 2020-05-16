@@ -9,9 +9,9 @@ public class RedBlackTree {
      * Black node in red black tree
      * It represents all leaf in tree and root's parent
      */
-    private final TreeNode nil = new TreeNode(null, null, null, Color.BLACK, -1);
+    public final TreeNode nil = new TreeNode(null, null, null, Color.BLACK, -1);
 
-    private TreeNode root;
+    public TreeNode root;
 
     /**
      * x    -->     y
@@ -23,7 +23,7 @@ public class RedBlackTree {
     private void leftRotate(RedBlackTree T, TreeNode x) {
         TreeNode y = x.right;
         x.right = y.left;
-        if (y.left.p != T.nil)
+        if (y.left != T.nil)
             y.left.p = x;
         y.p = x.p;
         if (x.p == T.nil)
@@ -67,7 +67,7 @@ public class RedBlackTree {
      * @param T red black tree
      * @param z the node to insert
      */
-    private void insert(RedBlackTree T, TreeNode z) {
+    public void insert(RedBlackTree T, TreeNode z) {
         TreeNode y = T.nil;
         TreeNode x = T.root;
         while (x != T.nil) {
@@ -91,10 +91,6 @@ public class RedBlackTree {
     }
 
     /**
-     * case 1: the uncle of the z is RED.
-     * case 2: the uncle of the z is BLACK and the z is a right child.
-     * case 3: the uncle of the z is BLACK and the z is a left child.
-     *
      * @param T
      * @param z
      */
@@ -103,40 +99,45 @@ public class RedBlackTree {
         while (z.p.color == Color.RED) {
             if (z.p == z.p.p.left) {
                 TreeNode y = z.p.p.right;
-                // case 1:
+                // case 1: the uncle of the z is RED.
                 if (y.color == Color.RED) {
                     z.p.color = Color.BLACK;
                     y.color = Color.BLACK;
                     z.p.p.color = Color.RED;
                     z = z.p.p;
                 }
-                // case 2:
+                // case 2: the uncle of the z is BLACK and the z is a right child.
                 else if (z.p.right == z) {
                     z = z.p;
                     leftRotate(T, z);
                 }
-                // case 3:
-                z.p.color = Color.BLACK;
-                z.p.p.color = Color.RED;
-                rightRotate(T, z.p.p);
-            } else {
+                // case 3: the uncle of the z is BLACK and the z is a left child.
+                else {
+                    z.p.color = Color.BLACK;
+                    z.p.p.color = Color.RED;
+                    rightRotate(T, z.p.p);
+                }
+
+            } else if (z.p == z.p.p.right) {
                 TreeNode y = z.p.p.left;
-                // case 1:
+                // case 4: the uncle of the z is RED.
                 if (y.color == Color.RED) {
                     z.p.color = Color.BLACK;
                     y.color = Color.BLACK;
                     z.p.p.color = Color.RED;
                     z = z.p.p;
                 }
-                // case 2:
-                else if (z.p.right == z) {
+                // case 5: the uncle of the z is BLACK and the z is a left child.
+                else if (z.p.left == z) {
                     z = z.p;
-                    leftRotate(T, z);
+                    rightRotate(T, z);
                 }
-                // case 3:
-                z.p.color = Color.BLACK;
-                z.p.p.color = Color.RED;
-                rightRotate(T, z.p.p);
+                // case 6: the uncle of the z is BLACK and the z is a right child.
+                else {
+                    z.p.color = Color.BLACK;
+                    z.p.p.color = Color.RED;
+                    leftRotate(T, z.p.p);
+                }
             }
             T.root.color = Color.BLACK;
         }
@@ -204,11 +205,6 @@ public class RedBlackTree {
     }
 
     /**
-     * case 1: x's brother is RED.
-     * case 2: x's brother w is BLACK and w's two children are BLACK.
-     * case 3: x's brother w is BLACK and w's left-child is RED, another is BLACK.
-     * case 4: x's brother w is BLACK and w's right-child id RED
-     *
      * @param T
      * @param x
      */
@@ -216,28 +212,27 @@ public class RedBlackTree {
         while (x != T.root && x.color == Color.BLACK) {
             if (x == x.p.left) {
                 TreeNode w = x.p.right;
-                // case 1:
+                // case 1: x's brother is RED.
                 if (w.color == Color.RED) {
                     w.color = Color.BLACK;
                     x.p.color = Color.RED;
                     leftRotate(T, x.p);
                     w = x.p.right;
                 }
-                // case 2:
+                // case 2: x's brother w is BLACK and w's two children are BLACK.
                 if (w.left.color == Color.BLACK && w.right.color == Color.BLACK) {
                     w.color = Color.RED;
                     x = x.p;
                 }
-                // case 3:
-                else if (w.right.color == Color.BLACK && w.left.color == Color.RED) {
-                    w.left.color = Color.BLACK;
-                    w.color = Color.BLACK;
-                    rightRotate(T, w);
-                    w = x.p.right;
-
-                }
-                // case 4:
-                if (w.right.color == Color.RED) {
+                // case 3: x's brother w is BLACK and w's left-child is RED, another is BLACK.
+                else {
+                    if (w.right.color == Color.BLACK) {
+                        w.left.color = Color.BLACK;
+                        w.color = Color.BLACK;
+                        rightRotate(T, w);
+                        w = x.p.right;
+                    }
+                    //case 4: x's brother w is BLACK and w's right-child id RED.
                     w.color = x.p.color;
                     x.p.color = Color.BLACK;
                     w.right.color = Color.BLACK;
@@ -247,30 +242,30 @@ public class RedBlackTree {
                 // Symmetry
             } else {
                 TreeNode w = x.p.left;
-                // case 1:
+                // case 1: x's brother is RED.
                 if (w.color == Color.RED) {
                     w.color = Color.BLACK;
                     x.p.color = Color.RED;
                     rightRotate(T, x.p);
                     w = x.p.left;
                 }
-                // case 2:
+                // case 2:  x's brother w is BLACK and w's two children are BLACK.
                 if (w.left.color == Color.BLACK && w.right.color == Color.BLACK) {
                     w.color = Color.RED;
                     x = x.p;
                 }
-                // case 3:
-                else if (w.right.color == Color.BLACK && w.left.color == Color.RED) {
-                    w.left.color = Color.BLACK;
-                    w.color = Color.BLACK;
-                    rightRotate(T, w);
-                    w = x.p.left;
-                }
-                // case 4:
-                if (w.right.color == Color.RED) {
+                // case 3:  x's brother w is BLACK and w's right-child is RED, another is BLACK.
+                else {
+                    if (w.left.color == Color.BLACK) {
+                        w.right.color = Color.BLACK;
+                        w.color = Color.BLACK;
+                        leftRotate(T, w);
+                        w = x.p.left;
+                    }
+                    // case 4: x's brother w is BLACK and w's left-child id RED.
                     w.color = x.p.color;
                     x.p.color = Color.BLACK;
-                    w.right.color = Color.BLACK;
+                    w.left.color = Color.BLACK;
                     rightRotate(T, x.p);
                     x = T.root;
                 }
